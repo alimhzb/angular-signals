@@ -1,4 +1,4 @@
-import {Component, computed, inject, linkedSignal} from '@angular/core';
+import {Component, computed, inject, linkedSignal, signal} from '@angular/core';
 import {ProductService} from '../product.service';
 import {FormsModule} from '@angular/forms';
 import {CurrencyPipe} from '@angular/common';
@@ -16,18 +16,19 @@ export class ProductSelection {
   pageTitle = 'Product Selection';
   private productService = inject(ProductService);
 
-  // Signals used by the template
-  selectedProduct = this.productService.selectedProduct;
-  quantity = linkedSignal({
-    source: this.selectedProduct,
-    computation: p => 1
-  });
-
   // Reference the resource properties to simplify the code
   products = this.productService.productsResource.value;
   isLoading = this.productService.productsResource.isLoading;
   error = this.productService.productsResource.error;
   errorMessage = computed(() => this.error() ? this.error()?.message : '');
+
+  // Signals used by the template
+  selectedProduct = this.productService.selectedProduct;
+  quantity = signal(1);
+  // quantity = linkedSignal({
+  //   source: this.selectedProduct,
+  //   computation: p => 1
+  // });
 
   // React to changes and recompute
   total = computed(() => (this.selectedProduct()?.price ?? 0) * this.quantity());
